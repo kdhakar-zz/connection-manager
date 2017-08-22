@@ -1,6 +1,6 @@
 package com.http.connection;
 
-import com.http.connection.exception.HttpConnectionException;
+import com.http.connection.exception.ServiceException;
 import com.http.connection.manager.HttpConnectionManager;
 import com.http.connection.manager.HttpRequestExecutor;
 import com.http.connection.model.ConnectionConfig;
@@ -15,7 +15,8 @@ import java.util.Map;
 public class Example {
     private static final String CLIENT1 = "client1";
 
-    public static void main(String[] args) throws HttpConnectionException {
+    public static void main(String[] args) throws ServiceException {
+        //create connection pool config for multiple clients.
         Map<String, ConnectionConfig> poolsConfigMap = new HashMap<>();
         ConnectionConfig config = new ConnectionConfig();
         config.setHost("localhost");
@@ -28,8 +29,7 @@ public class Example {
 
         HttpConnectionManager.init(poolsConfigMap);
 
-
-        //create appropriate jsonHttpRequest and pass
+        //now execute request for client1 (it will use its own connection pool).
         JSONHttpRequest jsonHttpRequest = new JSONHttpRequest();
         HttpRequestExecutor.getInstance().execute(CLIENT1, jsonHttpRequest);
 

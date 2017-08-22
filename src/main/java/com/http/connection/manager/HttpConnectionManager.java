@@ -1,6 +1,7 @@
 package com.http.connection.manager;
 
-import com.http.connection.exception.HttpConnectionException;
+import com.http.connection.exception.ServiceErrorCode;
+import com.http.connection.exception.ServiceException;
 import com.http.connection.model.ConnectionConfig;
 import com.http.connection.model.JSONHttpRequest;
 import com.http.connection.model.JSONHttpResponse;
@@ -27,7 +28,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,7 +83,7 @@ public class HttpConnectionManager {
     /*
     Method to release connections.
      */
-    public static void destroy(Set<String> clientList) throws HttpConnectionException {
+    public static void destroy(Set<String> clientList) throws ServiceException {
         if (clientList.isEmpty()) {
             clientList = closeableHttpClientMap.keySet();
         }
@@ -91,16 +94,23 @@ public class HttpConnectionManager {
                 client.close();
             } catch (IOException e) {
                 logger.error("Exception while releasing connections", e);
-                throw new HttpConnectionException(e);
+                throw new ServiceException(ServiceErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
         logger.info("HttpConnectionManager destroyed successfully for services : {}", poolConfigMap.keySet());
     }
 
     /*
+    release connections for specific clientId.
+     */
+    public static void closeConnectionPool(String clientId) throws ServiceException {
+        destroy(new HashSet<>(Collections.singletonList(clientId)));
+    }
+
+    /*
     Constructor to get instance and initialize object level variables.
      */
-    HttpConnectionManager(String client, JSONHttpRequest jsonHttpRequest) throws HttpConnectionException {
+    HttpConnectionManager(String client, JSONHttpRequest jsonHttpRequest) throws ServiceException {
         this.jsonHttpRequest = jsonHttpRequest;
         this.client = client;
 
@@ -115,14 +125,14 @@ public class HttpConnectionManager {
             this.urlString = URLDecoder.decode(uri.toString(), UTF_8);
         } catch (URISyntaxException | UnsupportedEncodingException e) {
             logger.error("Exception while constructing url and setting object level variables for client : {} and jsonHttpRequest : {}", client, jsonHttpRequest);
-            throw new HttpConnectionException(e);
+            throw new ServiceException(ServiceErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
     /*
     Method to execute a request.
      */
-    JSONHttpResponse execute() throws HttpConnectionException, IOException {
+    JSONHttpResponse execute() throws ServiceException, IOException {
         HttpRequestBase request = createHttpRequest(jsonHttpRequest);
 
         if (request == null) {
