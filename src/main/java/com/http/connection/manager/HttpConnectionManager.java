@@ -41,17 +41,15 @@ public class HttpConnectionManager {
     private static final Logger logger = LoggerFactory.getLogger(HttpConnectionManager.class);
     private static final String UTF_8 = "UTF-8";
 
-    //per object variables.
     private String urlString;
     private String client;
     private JSONHttpRequest jsonHttpRequest;
 
-    //class level variables.
     private static Map<String, ConnectionConfig> poolConfigMap;
     private static Map<String, CloseableHttpClient> closeableHttpClientMap;
 
     /*
-    Init method to initialize class level variables (poolConfig and CloseableHttpClient with custom configs per client).
+    Init method to initialize poolConfig and CloseableHttpClient with custom configs per client.
      */
     public static void init(Map<String, ConnectionConfig> poolsConfigMap) {
         poolConfigMap = poolsConfigMap;
@@ -84,20 +82,17 @@ public class HttpConnectionManager {
     Method to release connections.
      */
     public static void destroy(Set<String> clientList) throws ServiceException {
-        if (clientList.isEmpty()) {
-            clientList = closeableHttpClientMap.keySet();
-        }
-
         for (String clientId : clientList) {
-            CloseableHttpClient client = closeableHttpClientMap.get(clientId);
-            try {
-                client.close();
-            } catch (IOException e) {
-                logger.error("Exception while releasing connections", e);
-                throw new ServiceException(ServiceErrorCode.INTERNAL_SERVER_ERROR);
+            if (closeableHttpClientMap.containsKey(clientId)) {
+                try {
+                    closeableHttpClientMap.get(clientId).close();
+                } catch (IOException e) {
+                    logger.error("Exception while releasing connections", e);
+                    throw new ServiceException(ServiceErrorCode.INTERNAL_SERVER_ERROR);
+                }
             }
         }
-        logger.info("HttpConnectionManager destroyed successfully for services : {}", poolConfigMap.keySet());
+        logger.info("HttpConnectionManager destroyed successfully for clients : {}", poolConfigMap.keySet());
     }
 
     /*

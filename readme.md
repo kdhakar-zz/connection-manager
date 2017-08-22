@@ -1,7 +1,7 @@
 # HTTP Connection pool
 
-This module contains the library code for Closeable HTTP Connection pool.
-This library will create CloseableHttpClient (with custom properties) for every client defined in config file. 
+This module contains code for custom closeable HTTP Connection pool.
+This library will create CloseableHttpClient (with custom properties) for every client passed in init. 
 
 - Sample usage:
     ````
