@@ -5,8 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.http.connection</groupId>
-    <artifactId>connection-pool</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>connection-manager</artifactId>
     <version>1.0.0</version>
 
     <dependencies>
@@ -19,6 +18,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

@@ -1,92 +1,40 @@
 package com.http.connection.model;
 
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author : komal.nagar
  */
+@Getter
+@ToString
+@AllArgsConstructor
 public class ConnectionConfig {
-    @NotNull
-    private String host;
-
-    @NotNull
-    private int port;
-
-    @NotNull
-    private int connectionPoolSize;
-
-    //Connection timeout is the timeout until a connection with the server is established.
-    @NotNull
+    /*
+     Timeout in milliseconds until a connection is established.
+     */
     private int connectTimeout;
-
-    //ConnectionRequestTimeout used when requesting a connection from the connection manager.
-    @NotNull
-    private int connectionRequestTimeout;
-
-    //is the timeout to receive data (socket timeout).
-    @NotNull
+    /*
+     Timeout in milliseconds which is the timeout for waiting for data.
+     */
     private int socketTimeout;
+    /*
+     Timeout in milliseconds requesting a connection from the connection manager.
+     */
+    private int requestTimeout;
 
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public int getConnectionPoolSize() {
-        return connectionPoolSize;
-    }
-
-    public void setConnectionPoolSize(int connectionPoolSize) {
-        this.connectionPoolSize = connectionPoolSize;
-    }
-
-    public int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    public void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public int getConnectionRequestTimeout() {
-        return connectionRequestTimeout;
-    }
-
-    public void setConnectionRequestTimeout(int connectionRequestTimeout) {
-        this.connectionRequestTimeout = connectionRequestTimeout;
-    }
-
-    public int getSocketTimeout() {
-        return socketTimeout;
-    }
-
-    public void setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("host", host)
-                .append("port", port)
-                .append("connectionPoolSize", connectionPoolSize)
-                .append("connectTimeout", connectTimeout)
-                .append("connectionRequestTimeout", connectionRequestTimeout)
-                .append("socketTimeout", socketTimeout)
-                .toString();
-    }
+    /*
+    Defines the overall connection limit for a connection pool.
+     */
+    private int maxTotalConnection;
+    /*
+     defines a connection limit per one HTTP route. In simple cases you can understand this as a per target host limit.
+     Under the hood things are a bit more interesting: HttpClient maintains a couple of HttpRoute objects,
+     which represent a chain of hosts each, like proxy1 -> proxy2 -> targetHost.
+     Connections are pooled on per-route basis. In simple cases, when you're using default route-building mechanism
+     and provide no proxy support, your routes are likely to include target host only, so per-route connection pool limit effectively
+     becomes per-host limit.
+     */
+    private int maxConnectionPerRoute;
 }
